@@ -155,7 +155,7 @@ To load the master library,
 
 master new
 ----------
-`syntax: local master, err = resolver_master:new(shared_dict_key, domain, nameservers [, min_ttl, max_ttl, dns_timeout])`
+`syntax: local master, err = resolver_master:new(shared_dict_key, domain, nameservers [, min_ttl, max_ttl, dns_timeout, blacklist])`
 
 Creates a new master instance. Returns the instance and an error string.
 If successful the error string will be `nil`.
@@ -179,6 +179,9 @@ The `dns_timeout` argument determines the maximum amount of time in seconds to w
 We also use this value to schedule future DNS queries (i.e. query a bit earlier than the TTL suggests to allow for potential lag up to the `dns_timeout` value when receiving the results).
 **Note:** this is _NOT_ the total timeout for all nameservers. The total time is calculated as `dns_timeout * 5` since we use the default `retrans` value in [resty.dns.resolver:new](https://github.com/openresty/lua-resty-dns#new).
 The default value is `2`.
+
+The `blacklist` argument specifies table of banned IP addresses which are ignored if included in DNS server response.
+The default value is `{"127.0.0.1"}`.
 
 The master instance is thread safe and can be safely shared globally (typically declared as a global in a [init_by_lua_block](https://github.com/openresty/lua-nginx-module#init_by_lua_block)).
 

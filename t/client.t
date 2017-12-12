@@ -73,11 +73,13 @@ no hosts available
 
 
 === TEST 4: catch expired hosts error
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
 --- http_config
     lua_shared_dict test_res 1m;
     init_by_lua_block {
         local resolver_master = require "resolver.master"
-        local goog_master = resolver_master:new("test_res", "google.com", {"8.8.8.8"})
+        local goog_master = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")})
         goog_master:set({
             {
                 address = "17.0.0.1",
@@ -105,11 +107,13 @@ all hosts expired
 
 
 === TEST 5: get an address
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
 --- http_config
     lua_shared_dict test_res 1m;
     init_by_lua_block {
         local resolver_master = require "resolver.master"
-        local goog_master = resolver_master:new("test_res", "google.com", {"8.8.8.8"})
+        local goog_master = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")})
         goog_master:set({
             {
                 address = "17.0.0.1",
@@ -137,11 +141,13 @@ all hosts expired
 
 
 === TEST 6: get stale address
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
 --- http_config
     lua_shared_dict test_res 1m;
     init_by_lua_block {
         local resolver_master = require "resolver.master"
-        local goog_master = resolver_master:new("test_res", "google.com", {"8.8.8.8"})
+        local goog_master = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")})
         goog_master:set({
             {
                 address = "17.0.0.1",
@@ -169,11 +175,13 @@ all hosts expired
 
 
 === TEST 7: get round-robin
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
 --- http_config
     lua_shared_dict test_res 1m;
     init_by_lua_block {
         local resolver_master = require "resolver.master"
-        local goog_master = resolver_master:new("test_res", "google.com", {"8.8.8.8"})
+        local goog_master = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")})
         goog_master:set({
             {
                 address = "17.0.0.1",
@@ -224,11 +232,13 @@ all hosts expired
 
 
 === TEST 8: skip expired
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
 --- http_config
     lua_shared_dict test_res 1m;
     init_by_lua_block {
         local resolver_master = require "resolver.master"
-        local goog_master = resolver_master:new("test_res", "google.com", {"8.8.8.8"})
+        local goog_master = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")})
         local exp_offset = ngx.now() - 30
         goog_master:set({
             {
@@ -268,11 +278,13 @@ all hosts expired
 
 
 === TEST 9: select least expired
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
 --- http_config
     lua_shared_dict test_res 1m;
     init_by_lua_block {
         local resolver_master = require "resolver.master"
-        local goog_master = resolver_master:new("test_res", "google.com", {"8.8.8.8"})
+        local goog_master = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")})
         local exp_offset = ngx.now() - 30
         goog_master:set({
             {
@@ -312,11 +324,13 @@ all hosts expired
 
 
 === TEST 10: obey ttl for re-sync
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
 --- http_config
     lua_shared_dict test_res 1m;
     init_by_lua_block {
         local resolver_master = require "resolver.master"
-        goog_master = resolver_master:new("test_res", "google.com", {"8.8.8.8"}, 1)
+        goog_master = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")}, 1)
         goog_master:set({
             {
                 address = "17.0.0.1",
@@ -361,11 +375,13 @@ all hosts expired
 
 
 === TEST 11: don't wipe stale local entries on failed re-sync
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
 --- http_config
     lua_shared_dict test_res 1m;
     init_by_lua_block {
         local resolver_master = require "resolver.master"
-        goog_master = resolver_master:new("test_res", "google.com", {"8.8.8.8"}, 1)
+        goog_master = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")}, 1)
         goog_master:set({
             {
                 address = "17.0.0.1",
@@ -409,11 +425,13 @@ nil
 
 
 === TEST 12: sync picks up changes
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
 --- http_config
     lua_shared_dict test_res 1m;
     init_by_lua_block {
         local resolver_master = require "resolver.master"
-        goog_master = resolver_master:new("test_res", "google.com", {"8.8.8.8"}, 1)
+        goog_master = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")}, 1)
         goog_master:set({
             {
                 address = "17.0.0.1",
