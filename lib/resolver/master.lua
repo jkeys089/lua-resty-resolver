@@ -8,18 +8,13 @@ local _M = { _VERSION = '0.01' }
 
 local mt = { __index = _M }
 
-local BANNED_IPS = {
-    ["127.0.0.1"] = true
-}
-
-
 local resolve, schedule
 
 schedule = function(master, delay)
     local ok, err = ngx.timer.at(delay, function(premature, master) 
         if not premature then
             resolve(master)
-        end        
+        end
     end, master)
 
     if not ok then
@@ -72,11 +67,11 @@ resolve = function(master)
     end
 
     -- DNS query was successful, store the result and schedule the next lookup
-    schedule(master, master:set(answers))    
+    schedule(master, master:set(answers))
 end
 
 
-function _M.new(class, shared_dict_key, domain, nameservers, min_ttl, max_ttl, dns_timeout)
+function _M.new(class, shared_dict_key, domain, nameservers, min_ttl, max_ttl, dns_timeout, blacklist)
     if not shared_dict_key or not ngx.shared[shared_dict_key] then
         return nil, "missing shared_dict_key"
     end
@@ -98,12 +93,19 @@ function _M.new(class, shared_dict_key, domain, nameservers, min_ttl, max_ttl, d
     local maxttl = max_ttl or 3600
     if maxttl < minttl then
         return nil, "max_ttl must >= min_ttl (" .. minttl .. ")"
-    end  
+    end
 
     local timeout = dns_timeout or 2
     if timeout <= 0 then
         return nil, "dns_timeout must be a positive number"
     end
+
+    blacklist = blacklist or { "127.0.0.1" }
+    if type(blacklist) ~= 'table' then
+        return nil, "blacklist must be a table"
+    end
+    local blacklist_table = {}
+    for _, l in ipairs(blacklist) do blacklist_table[l] = true end
 
     local self = setmetatable({
         _name        = "_master_[" .. domain .. "]_",
@@ -114,7 +116,8 @@ function _M.new(class, shared_dict_key, domain, nameservers, min_ttl, max_ttl, d
         _min_ttl     = minttl,
         _max_ttl     = maxttl,
         _timeout     = timeout,
-        _nameservers = nameservers
+        _nameservers = nameservers,
+        _blacklist   = blacklist_table
     }, mt)
 
     return self, nil
@@ -144,12 +147,13 @@ function _M.set(self, lookup_result, exp_offset)
     local cache = ngx.shared[self._shared_key]
     local minttl = self._min_ttl
     local maxttl = self._max_ttl
+    local blacklist = self._blacklist
     local timeout = self._timeout
     local next_res = maxttl
     local exp_offset = exp_offset or ngx.now()
-    
+
     for i, ans in ipairs(lookup_result) do
-        if not BANNED_IPS[ans.address] then
+        if not blacklist[ans.address] then
             local ttl = ans.ttl
 
             if ttl < minttl then
@@ -169,7 +173,7 @@ function _M.set(self, lookup_result, exp_offset)
         end
     end
 
-    if next_res > timeout then 
+    if next_res > timeout then
         next_res = next_res - timeout
     end
 

@@ -8,11 +8,13 @@ __DATA__
 
 
 === TEST 1: manual hosts
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
 --- http_config
     lua_shared_dict test_res 1m;
     init_by_lua_block {
         local resolver_master = require "resolver.master"
-        local goog_master = resolver_master:new("test_res", "google.com", {"8.8.8.8"})
+        local goog_master = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")})
         goog_master:set({
             {
                 address = "17.0.0.1",
@@ -39,14 +41,16 @@ google.com_17.0.0.1
 
 
 === TEST 2: query hosts
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
 --- http_config
     lua_shared_dict test_res 1m;
     init_by_lua_block {
         local resolver_master = require "resolver.master"
-        goog_master = resolver_master:new("test_res", "google.com", {"8.8.8.8"}, 10, 30)
+        goog_master = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")}, 10, 30)
     }
     init_worker_by_lua_block {
-        goog_master:init()   
+        goog_master:init()
     }
 --- config
     location /t {
@@ -72,11 +76,13 @@ google.com_17.0.0.1
 
 
 === TEST 3: multiple inits single master
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
 --- http_config
     lua_shared_dict test_res 1m;
     init_by_lua_block {
         local resolver_master = require "resolver.master"
-        goog_master = resolver_master:new("test_res", "google.com", {"8.8.8.8"}, 10, 30)
+        goog_master = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")}, 10, 30)
     }
     init_worker_by_lua_block {
         for i = 1,10 do
@@ -105,13 +111,15 @@ google.com_17.0.0.1
 
 
 === TEST 4: multiple inits multiple masters
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
 --- http_config
     lua_shared_dict test_res 1m;
     init_by_lua_block {
         local resolver_master = require "resolver.master"
-        goog_master_a = resolver_master:new("test_res", "google.com", {"8.8.8.8"}, 10, 30)
-        goog_master_b = resolver_master:new("test_res", "google.com", {"8.8.8.8"}, 10, 30)
-        goog_master_c = resolver_master:new("test_res", "google.com", {"8.8.8.8"}, 10, 30)
+        goog_master_a = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")}, 10, 30)
+        goog_master_b = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")}, 10, 30)
+        goog_master_c = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")}, 10, 30)
     }
     init_worker_by_lua_block {
         for i = 1,10 do
@@ -142,11 +150,13 @@ google.com_17.0.0.1
 
 
 === TEST 5: filter banned ip's
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
 --- http_config
     lua_shared_dict test_res 1m;
     init_by_lua_block {
         local resolver_master = require "resolver.master"
-        local goog_master = resolver_master:new("test_res", "google.com", {"8.8.8.8"})
+        local goog_master = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")})
         goog_master:set({
             {
                 address = "17.0.0.1",
@@ -181,15 +191,17 @@ google.com_17.0.0.1
 
 
 === TEST 6: catch shared dict init problems
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
 --- http_config
     lua_shared_dict test_res 1m;
 --- config
     location /t {
         content_by_lua_block {
             local resolver_master = require "resolver.master"
-            local goog_master, err = resolver_master:new(nil, "google.com", {"8.8.8.8"})
+            local goog_master, err = resolver_master:new(nil, "google.com", {os.getenv("DNS_SERVER_IP")})
             ngx.say(err)
-            goog_master, err = resolver_master:new("bad_key", "google.com", {"8.8.8.8"})
+            goog_master, err = resolver_master:new("bad_key", "google.com", {os.getenv("DNS_SERVER_IP")})
             ngx.say(err)
         }
     }
@@ -203,17 +215,19 @@ missing shared_dict_key
 
 
 === TEST 7: catch domain init problems
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
 --- http_config
     lua_shared_dict test_res 1m;
 --- config
     location /t {
         content_by_lua_block {
             local resolver_master = require "resolver.master"
-            local goog_master, err = resolver_master:new("test_res", nil, {"8.8.8.8"})
+            local goog_master, err = resolver_master:new("test_res", nil, {os.getenv("DNS_SERVER_IP")})
             ngx.say(err)
-            goog_master, err = resolver_master:new("test_res", "", {"8.8.8.8"})
+            goog_master, err = resolver_master:new("test_res", "", {os.getenv("DNS_SERVER_IP")})
             ngx.say(err)
-            goog_master, err = resolver_master:new("test_res", "  ", {"8.8.8.8"})
+            goog_master, err = resolver_master:new("test_res", "  ", {os.getenv("DNS_SERVER_IP")})
             ngx.say(err)
         }
     }
@@ -228,17 +242,19 @@ missing domain
 
 
 === TEST 8: catch min / max ttl init problems
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
 --- http_config
     lua_shared_dict test_res 1m;
 --- config
     location /t {
         content_by_lua_block {
             local resolver_master = require "resolver.master"
-            local goog_master, err = resolver_master:new("test_res", "google.com", {"8.8.8.8"}, 0, 30)
+            local goog_master, err = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")}, 0, 30)
             ngx.say(err)
-            goog_master, err = resolver_master:new("test_res", "google.com", {"8.8.8.8"}, -1, 30)
+            goog_master, err = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")}, -1, 30)
             ngx.say(err)
-            goog_master, err = resolver_master:new("test_res", "google.com", {"8.8.8.8"}, 10, 9)
+            goog_master, err = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")}, 10, 9)
             ngx.say(err)
         }
     }
@@ -253,15 +269,17 @@ max_ttl must >= min_ttl (10)
 
 
 === TEST 9: catch dns_timeout init problems
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
 --- http_config
     lua_shared_dict test_res 1m;
 --- config
     location /t {
         content_by_lua_block {
             local resolver_master = require "resolver.master"
-            local goog_master, err = resolver_master:new("test_res", "google.com", {"8.8.8.8"}, 10, 30, 0)
+            local goog_master, err = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")}, 10, 30, 0)
             ngx.say(err)
-            goog_master, err = resolver_master:new("test_res", "google.com", {"8.8.8.8"}, 10, 30, -1)
+            goog_master, err = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")}, 10, 30, -1)
             ngx.say(err)
         }
     }
@@ -304,7 +322,7 @@ missing nameservers
         goog_master = resolver_master:new("test_res", "google.com", {"127.0.0.1"}, 10, 30)
     }
     init_worker_by_lua_block {
-        goog_master:init()   
+        goog_master:init()
     }
 --- config
     location /t {
@@ -325,7 +343,7 @@ resolver master failed to query DNS for domain 'google.com'
         goog_master = resolver_master:new("test_res", "google.com", {{"boom", 0}}, 10, 30)
     }
     init_worker_by_lua_block {
-        goog_master:init()   
+        goog_master:init()
     }
 --- config
     location /t {
@@ -339,14 +357,16 @@ resolver master failed to create resty.dns.resolver for domain 'google.com'
 
 
 === TEST 13: backup nameserver
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
 --- http_config
     lua_shared_dict test_res 1m;
     init_by_lua_block {
         local resolver_master = require "resolver.master"
-        goog_master = resolver_master:new("test_res", "google.com", {"127.0.0.1","8.8.8.8"}, 1, 1)
+        goog_master = resolver_master:new("test_res", "google.com", {"127.0.0.1",os.getenv("DNS_SERVER_IP")}, 1, 1)
     }
     init_worker_by_lua_block {
-        goog_master:init()   
+        goog_master:init()
     }
 --- config
     location /t {
@@ -373,14 +393,16 @@ resolver master failed to query DNS for domain 'google.com'
 
 
 === TEST 14: bogus domain alerts
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
 --- http_config
     lua_shared_dict test_res 1m;
     init_by_lua_block {
         local resolver_master = require "resolver.master"
-        goog_master = resolver_master:new("test_res", "iam.notreal.fake", {"8.8.8.8"}, 10, 30)
+        goog_master = resolver_master:new("test_res", "iam.notreal.fake", {os.getenv("DNS_SERVER_IP")}, 10, 30)
     }
     init_worker_by_lua_block {
-        goog_master:init()   
+        goog_master:init()
     }
 --- config
     location /t {
@@ -394,12 +416,14 @@ resolver master failed to resolve domain 'iam.notreal.fake'
 
 
 === TEST 15: failed init
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
 --- http_config
     lua_max_pending_timers 1;
     lua_shared_dict test_res 1m;
     init_by_lua_block {
         local resolver_master = require "resolver.master"
-        goog_master = resolver_master:new("test_res", "google.com", {"8.8.8.8"}, 10, 30)
+        goog_master = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")}, 10, 30)
     }
     init_worker_by_lua_block {
         ngx.timer.at(30, function() return true end)
@@ -419,16 +443,18 @@ too many pending timers
 
 
 === TEST 16: unable to schedule resolve alerts
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
 --- http_config
     lua_max_pending_timers 2;
     lua_shared_dict test_res 1m;
     init_by_lua_block {
         local resolver_master = require "resolver.master"
-        goog_master = resolver_master:new("test_res", "google.com", {"8.8.8.8"}, 2, 2)
+        goog_master = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")}, 2, 2)
     }
     init_worker_by_lua_block {
-        ngx.timer.at(0, function() 
-            ngx.timer.at(0, function() 
+        ngx.timer.at(0, function()
+            ngx.timer.at(0, function()
                 ngx.timer.at(30, function() return true end)
                 ngx.timer.at(30, function() return true end)
             end)
@@ -447,11 +473,13 @@ resolver master failed to create resolve timer for domain 'google.com'
 
 
 === TEST 17: obey min / max ttl
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
 --- http_config
     lua_shared_dict test_res 1m;
     init_by_lua_block {
         local resolver_master = require "resolver.master"
-        local goog_master = resolver_master:new("test_res", "google.com", {"8.8.8.8"}, 10, 30)
+        local goog_master = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")}, 10, 30)
         goog_master:set({
             {
                 address = "17.0.0.1",
@@ -488,20 +516,22 @@ google.com_17.0.0.3=1482624010
 
 
 === TEST 18: next resolve time
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
 --- http_config
     lua_shared_dict test_res 1m;
     init_by_lua_block {
         local resolver_master = require "resolver.master"
-        goog_master = resolver_master:new("test_res", "google.com", {"8.8.8.8"}, 10, 30, 2)
+        goog_master = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")}, 10, 30, 2)
     }
 --- config
     location /t {
         content_by_lua_block {
-            ngx.say(goog_master:set({{ 
+            ngx.say(goog_master:set({{
                 address = "17.0.0.1",
                 ttl = 300
             }}))
-            ngx.say(goog_master:set({{ 
+            ngx.say(goog_master:set({{
                 address = "17.0.0.1",
                 ttl = 0
             }}))
@@ -531,3 +561,46 @@ google.com_17.0.0.3=1482624010
 [error]
 
 
+=== TEST 19: filter banned 127.0.53.53 and 127.0.0.1 ip's
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
+--- http_config
+    lua_shared_dict test_res 1m;
+    init_by_lua_block {
+        local resolver_master = require "resolver.master"
+        local goog_master = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")}, nil, nil, nil, {"127.0.0.1", "127.0.53.53"})
+        goog_master:set({
+            {
+                address = "17.0.0.1",
+                ttl = 300
+            },
+            {
+                address = "127.0.0.1", -- banned
+                ttl = 300
+            },
+            {
+                address = "127.0.53.53", -- banned
+                ttl = 300
+            },
+        }, 1482624000)
+    }
+--- config
+    location /t {
+        content_by_lua_block {
+            local keys = ngx.shared.test_res:get_keys()
+            for i, k in ipairs(keys) do
+                local v, err = ngx.shared.test_res:get(k)
+                if v ~= "_master_" then
+                    ngx.say(k)
+                    ngx.say(v)
+                end
+            end
+        }
+    }
+--- request
+    GET /t
+--- response_body
+google.com_17.0.0.1
+1482624300
+--- no_error_log
+[error]
