@@ -1,6 +1,7 @@
 PREFIX ?=          /opt/openresty
 LUA_LIB_DIR ?=     $(PREFIX)/lualib
 INSTALL ?= install
+DNS_SERVER_IP ?= 8.8.8.8
 
 .PHONY: all test install
 
@@ -11,5 +12,5 @@ install: all
 	$(INSTALL) lib/resolver/*.lua $(LUA_LIB_DIR)/resolver
 
 test: install
-	PATH=$(PREFIX)/nginx/sbin:$$PATH LUA_PATH="$(LUA_PATH);$(PREFIX)/lualib/?.lua;$(PREFIX)/nginx/lualib/?.lua;" prove -I../test-nginx/lib -r t
+	PATH=$(PREFIX)/nginx/sbin:$$PATH LUA_PATH="$(LUA_PATH);$(PREFIX)/lualib/?.lua;$(PREFIX)/nginx/lualib/?.lua;" DNS_SERVER_IP=$(DNS_SERVER_IP) prove -I../test-nginx/lib -r t
 
