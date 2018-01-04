@@ -4,7 +4,7 @@ local resolver = require "resty.dns.resolver"
 local setmetatable = setmetatable
 
 
-local _M = { _VERSION = '0.01' }
+local _M = { _VERSION = '0.02' }
 
 local mt = { __index = _M }
 
