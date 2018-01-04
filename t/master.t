@@ -277,9 +277,9 @@ max_ttl must >= min_ttl (10)
     location /t {
         content_by_lua_block {
             local resolver_master = require "resolver.master"
-            local goog_master, err = resolver_master:new("test_res", "google.com", {"" .. os.getenv("DNS_SERVER_IP")}, 10, 30, 0)
+            local goog_master, err = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")}, 10, 30, 0)
             ngx.say(err)
-            goog_master, err = resolver_master:new("test_res", "google.com", {"" .. os.getenv("DNS_SERVER_IP")}, 10, 30, -1)
+            goog_master, err = resolver_master:new("test_res", "google.com", {os.getenv("DNS_SERVER_IP")}, 10, 30, -1)
             ngx.say(err)
         }
     }
