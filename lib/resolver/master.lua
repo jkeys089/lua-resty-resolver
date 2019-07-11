@@ -11,7 +11,7 @@ local mt = { __index = _M }
 local resolve, schedule
 
 schedule = function(master, delay)
-    local ok, err = ngx.timer.at(delay, function(premature, master) 
+    local ok, err = ngx.timer.at(delay, function(premature, master)
         if not premature then
             resolve(master)
         end
@@ -119,6 +119,8 @@ function _M.new(class, shared_dict_key, domain, nameservers, min_ttl, max_ttl, d
         _nameservers = nameservers,
         _blacklist   = blacklist_table
     }, mt)
+
+    ngx.shared[self._shared_key]:delete(self._name)
 
     return self, nil
 end
