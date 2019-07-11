@@ -1,0 +1,10 @@
+version: "3.7"
+
+services:
+  lua-resty-resolver:
+    build:
+      context: .
+    volumes:
+      - ".:/app"
+    image: lua-resty-resolver:latest
+    command: make test
