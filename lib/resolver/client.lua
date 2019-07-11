@@ -2,7 +2,7 @@ local ngx = require "ngx"
 local setmetatable = setmetatable
 
 
-local _M = { _VERSION = '0.02' }
+local _M = { _VERSION = '0.03' }
 
 local mt = { __index = _M }
 
