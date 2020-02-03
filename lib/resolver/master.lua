@@ -125,6 +125,12 @@ end
 
 
 function _M.init(self)
+    -- check process type
+    if ngx.worker.id() == nil then
+        -- helper process, do not even try to initialize master resolver
+        return true, nil
+    end
+    -- normal process, try to initialize master resolver
     local added, err, forced = ngx.shared[self._shared_key]:add(self._name, "_master_")
     if added then
         return ngx.timer.at(0, function(premature, master)
