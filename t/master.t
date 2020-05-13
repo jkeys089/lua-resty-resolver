@@ -604,3 +604,38 @@ google.com_17.0.0.1
 1482624300
 --- no_error_log
 [error]
+
+
+=== TEST 20: query hosts for sub-domain utilizing CNAME
+--- main_config
+    env DNS_SERVER_IP=8.8.8.8;
+--- http_config
+    lua_shared_dict test_res 1m;
+    init_by_lua_block {
+        local resolver_master = require "resolver.master"
+        goog_master = resolver_master:new("test_res", "www.microsoft.com", {os.getenv("DNS_SERVER_IP")}, 10, 30)
+    }
+    init_worker_by_lua_block {
+        goog_master:init()
+    }
+--- config
+    location /t {
+        content_by_lua_block {
+            ngx.sleep(2)
+            local keys = ngx.shared.test_res:get_keys()
+            for i, k in ipairs(keys) do
+                local v, err = ngx.shared.test_res:get(k)
+                if v ~= "_master_" then
+                    ngx.say(k)
+                    ngx.say(v)
+                    break
+                end
+            end
+        }
+    }
+--- request
+    GET /t
+--- response_body_like chop
+^www.microsoft.com_\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}.*\d+$
+--- no_error_log
+[error]

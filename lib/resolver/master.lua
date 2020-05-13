@@ -4,7 +4,7 @@ local resolver = require "resty.dns.resolver"
 local setmetatable = setmetatable
 
 
-local _M = { _VERSION = '0.04' }
+local _M = { _VERSION = '0.05' }
 
 local mt = { __index = _M }
 
@@ -168,7 +168,7 @@ function _M.set(self, lookup_result, exp_offset)
     local exp_offset = exp_offset or ngx.now()
 
     for i, ans in ipairs(lookup_result) do
-        if not blacklist[ans.address] then
+        if ans.address and not blacklist[ans.address] then
             local ttl = ans.ttl
 
             if ttl < minttl then
