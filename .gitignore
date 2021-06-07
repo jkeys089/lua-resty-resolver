@@ -4,3 +4,5 @@
 go
 t/servroot/
 reindex
+*.src.rock
+lua-resty-resolver*.tar.gz
