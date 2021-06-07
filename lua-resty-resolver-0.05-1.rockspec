@@ -1,8 +1,7 @@
 package = "lua-resty-resolver"
-version = "1.0-1"
+version = "0.05-1"
 source = {
    url = "git://github.com/jkeys089/lua-resty-resolver",
-   tag = "v1.0"
 }
 description = {
    summary = "Caching DNS resolver for ngx_lua and LuaJIT",
@@ -21,7 +20,7 @@ description = {
    license = "MIT"
 }
 dependencies = {
-   "lua-resty-dns == 0.21-1"
+   "lua-resty-dns >= 0.21-1"
 }
 build = {
    type = "builtin",
