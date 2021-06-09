@@ -22,6 +22,7 @@ Table of Contents
     * [get](#client-get)
 * [Prerequisites](#prerequisites)
 * [Installation](#installation)
+* [Demo](#demo)
 * [Copyright and License](#copyright-and-license)
 * [See Also](#see-also)
 
@@ -315,6 +316,13 @@ and then load the library in Lua:
 ```lua
     local resolver_master = require "resolver.master"
 ```
+
+Demo
+====
+
+A demo app is provided through [this repository](https://github.com/mauricioabreu/dynamic-dns-resolver-demo)
+
+With this app you can test all features provided by this library without having to integrate it in your real project.
 
 [Back to TOC](#table-of-contents)
 
