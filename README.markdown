@@ -128,7 +128,7 @@ Synopsis
             }
 
             location = /js {
-                proxy_pass http://cdnjs_backend/
+                proxy_pass http://cdnjs_backend/;
                 proxy_pass_header Server;
                 proxy_http_version 1.1;
                 proxy_set_header Connection "";
