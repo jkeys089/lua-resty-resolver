@@ -4,7 +4,7 @@ local resolver = require "resty.dns.resolver"
 local setmetatable = setmetatable
 
 
-local _M = { _VERSION = '0.05' }
+local _M = { _VERSION = '0.06' }
 
 local mt = { __index = _M }
 
@@ -42,7 +42,7 @@ resolve = function(master)
     while ns_cnt ~= 0 do
         local tries = {}
         answers, err = res:query(domain, master._qopts, tries)
-        
+
         for i, err in ipairs(tries) do
             err = "resolver master failed to query DNS for domain '" .. domain .. "': " .. err
             ngx.log(ngx.DEBUG, err)

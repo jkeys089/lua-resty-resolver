@@ -1,5 +1,5 @@
 package = "lua-resty-resolver"
-version = "0.05-1"
+version = "0.06"
 source = {
    url = "git://github.com/jkeys089/lua-resty-resolver",
 }
