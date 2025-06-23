@@ -30,6 +30,7 @@ resolve = function(master)
     })
     if not res then
         ngx.log(ngx.CRIT, "resolver master failed to create resty.dns.resolver for domain '", master._domain, "': ", err)
+        schedule(master, master._min_ttl)
         return
     end
 
