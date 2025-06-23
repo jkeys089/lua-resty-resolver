@@ -8,4 +8,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Unit test
-        run: docker-compose up
+        run: docker compose up

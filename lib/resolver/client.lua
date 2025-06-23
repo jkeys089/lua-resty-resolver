@@ -2,7 +2,7 @@ local ngx = require "ngx"
 local setmetatable = setmetatable
 
 
-local _M = { _VERSION = '0.05' }
+local _M = { _VERSION = '0.06' }
 
 local mt = { __index = _M }
 
@@ -30,7 +30,7 @@ local function sync(worker)
             if exp then
                 if exp < next_sync then
                     next_sync = exp
-                end                
+                end
                 hosts[#hosts+1] = {
                     address = k:sub(address_start),
                     exp = exp
@@ -40,7 +40,7 @@ local function sync(worker)
     end
 
     if #hosts > 0 then
-        if next_sync >= 1 then 
+        if next_sync >= 1 then
             next_sync = next_sync - 1
         end
         worker._hosts = hosts
@@ -85,7 +85,7 @@ function _M.get(self, exp_fallback_ok)
         hosts = self._hosts
         tot = #hosts
     end
-    
+
     if tot < 1 then
         return nil, "no hosts available"
     end
@@ -94,7 +94,7 @@ function _M.get(self, exp_fallback_ok)
     local idx = self._next_idx
     local exp_idxs = {}
     local cnt = 0
-    
+
     while not host and cnt < tot do
         if idx > tot then
             idx = 1
@@ -104,11 +104,11 @@ function _M.get(self, exp_fallback_ok)
 
         if cur_host.exp > now then
             host = cur_host
-        else                        
+        else
             if not fallback_idx or cur_host.exp > hosts[fallback_idx].exp then
                 fallback_idx = idx
             end
-                
+
             exp_idxs[#exp_idxs+1] = idx
 
             idx = idx + 1

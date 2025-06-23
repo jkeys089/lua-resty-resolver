@@ -1,5 +1,3 @@
-version: "3.7"
-
 services:
   lua-resty-resolver:
     build:

@@ -332,7 +332,7 @@ Copyright and License
 
 This module is licensed under the BSD license.
 
-Copyright (C) 2012-2020, Thought Foundry Inc.
+Copyright (C) 2012-2025, Thought Foundry Inc.
 
 All rights reserved.
 
@@ -352,4 +352,3 @@ See Also
 * the ngx_lua module: http://wiki.nginx.org/HttpLuaModule
 
 [Back to TOC](#table-of-contents)
-
